@@ -53,12 +53,12 @@ import { GoogleStrategy } from 'src/strategies/google.strategy';
 export class AuthModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(TokenMiddleware).forRoutes({
-            path: '/auth/validation/:token',
+            path: '/auth/validate/:token',
             method: RequestMethod.GET
         });
 
         consumer.apply(TokenMiddleware).forRoutes({
-            path: '/auth/verification/:token',
+            path: '/auth/verify/:token',
             method: RequestMethod.POST
         });
 

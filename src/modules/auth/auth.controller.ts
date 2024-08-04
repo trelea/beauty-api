@@ -52,7 +52,7 @@ export class AuthController {
     }
 
     // ADITIONAL STEP TOKEN VALIDATION FOR FRONTEND
-    @Get('validation/:token')
+    @Get('validate/:token')
     // DOCS
     @ApiOperation({ summary: 'Validate token for otp' })
     @ApiParam({
@@ -67,7 +67,7 @@ export class AuthController {
     }
 
     // STEP 2 OTP VERIFICATION
-    @Post('verification/:token')
+    @Post('verify/:token')
     // DOCS
     @ApiOperation({ summary: 'OTP Verification' })
     @ApiParam({
@@ -126,9 +126,9 @@ export class AuthController {
     }
 
     // TEST PURPOSE
-    // GET SESSION
-    @Get('sess')
+    // GET SESSION.USER
+    @Get('user')
     async getSession(@Req() req: Request) {
-        return req.session;
+        return req.session.user;
     }
 }

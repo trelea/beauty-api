@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common'
-import { PassportStrategy } from '@nestjs/passport'
-import { Strategy, VerifyCallback } from 'passport-google-oauth20'
-import { PrismaService } from 'prisma/prisma.service'
+import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -11,7 +11,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             callbackURL: process.env.GOOGLE_CLIENT_CALLBACK,
             scope: ['email', 'profile']
-        })
+        });
     }
 
     async validate(
@@ -24,15 +24,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
             where: {
                 id: profile.id
             }
-        })
+        });
         if (!gUser)
             await this.prisma.googleUser.create({
                 data: {
                     id: profile.id,
                     profile
                 }
-            })
+            });
 
-        done(null, profile)
+        done(null, profile);
     }
 }
