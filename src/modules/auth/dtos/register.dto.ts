@@ -3,9 +3,9 @@ import {
     IsString,
     Length,
     IsDateString,
-    IsPhoneNumber,
     IsEmail,
-    Matches
+    Matches,
+    IsMobilePhone
 } from 'class-validator';
 
 export class registerDTO {
@@ -19,7 +19,7 @@ export class registerDTO {
     @IsNotEmpty({ message: 'fisrtName field should not be empty' })
     readonly lastName: string;
 
-    @IsPhoneNumber('MD')
+    @IsMobilePhone()
     @IsNotEmpty({ message: 'phone field should not be empty' })
     readonly phone: string;
 
