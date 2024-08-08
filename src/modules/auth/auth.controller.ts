@@ -4,7 +4,6 @@ import {
     Get,
     Param,
     Post,
-    Query,
     Req,
     Res,
     UseGuards,
@@ -34,6 +33,7 @@ import {
 } from './docs/auth.res';
 import { otpBody } from './docs/otp.docs';
 import { loginBody } from './docs/login.docs';
+import { loginAdminDTO } from './dtos/login.admin.dto';
 
 @ApiTags('Auth APIs')
 @Controller('auth')
@@ -42,7 +42,7 @@ export class AuthController {
 
     // REGISTER
     @Post('register')
-    @UsePipes(ValidationPipe)
+    // @UsePipes(ValidationPipe)
     //DOCS
     @ApiOperation({ summary: 'Register new user' })
     @ApiBody(signupBody)
@@ -68,6 +68,7 @@ export class AuthController {
 
     // STEP 2 OTP VERIFICATION
     @Post('verify/:token')
+    @UsePipes(ValidationPipe)
     // DOCS
     @ApiOperation({ summary: 'OTP Verification' })
     @ApiParam({
@@ -110,9 +111,8 @@ export class AuthController {
     @UseGuards(AuthGuard('google'))
     // DOCS
     @ApiOperation({ summary: 'Signin with google redirection link' })
-    googleAuthRedirect(@Req() req: Request) {
-        req.session.user = req.user;
-        return req.user;
+    googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
+        return this.authService.googleAuthRedirect(req, res);
     }
 
     // LOGOUT
@@ -127,8 +127,15 @@ export class AuthController {
 
     // TEST PURPOSE
     // GET SESSION.USER
-    @Get('user')
+    @Get('/google/session')
     async getSession(@Req() req: Request) {
         return req.session.user;
+    }
+
+    // AUTH ADMIN
+    @Post('admin')
+    @UsePipes(ValidationPipe)
+    async adminAuth(@Req() req: Request, @Body() loginAdminDto: loginAdminDTO) {
+        return this.authService.adminAuth(req, loginAdminDto);
     }
 }

@@ -32,3 +32,41 @@ model googleUser {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
+
+model Admin {
+  id         String   @id @default(uuid())
+  username   String
+  password   String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum Service {
+  Lashes
+  Brows
+  Nails
+}
+
+model Master {
+  id          String    @id @default(uuid())
+  firstName   String
+  lastName    String
+  email       String    @unique
+  contact     String
+  birthDate   DateTime  @db.Date
+  description String?   @db.Text
+  thumbnail   String
+  services    Service[]
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  // MasterServices MasterServices[]
+}
+
+// model MasterServices {
+//   id         String   @id @default(uuid())
+//   master     Master   @relation(fields: [masterId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+//   masterId   String
+//   service    Service
+//   created_at DateTime @default(now())
+//   updated_at DateTime @updatedAt
+// }

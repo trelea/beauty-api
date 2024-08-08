@@ -12,8 +12,8 @@ import { Request, Response } from 'express';
 import { CryptoService } from 'src/utils/crypto.util';
 import { MailService } from 'src/utils/mail.util';
 import { otpDTO } from './dtos/otp.dto';
-import { loginDTO } from './dtos/login.dto';
-import { use } from 'passport';
+import { loginAdminDTO } from './dtos/login.admin.dto';
+// import { GoogleStrategy } from 'src/strategies/google.strategy';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +22,7 @@ export class AuthService {
         private readonly jwt: JwtService,
         private readonly crypto: CryptoService,
         private readonly mail: MailService
+        // private readonly googleStrategy: GoogleStrategy
     ) {}
 
     // REGISTER
@@ -88,5 +89,38 @@ export class AuthService {
         req.session.destroy(() => {
             return res.status(200).json({ message: 'Logout' }).end();
         });
+    }
+
+    // GOOGLE AUTH REDIRECT
+    googleAuthRedirect(req: Request, res: Response) {
+        if (req.user) {
+            req.session.user = req.user;
+            return res.redirect(process.env.SUCCESS_LINK);
+        }
+        return res.redirect(process.env.FAIL_LINK);
+    }
+
+    // AUTH ADMIN
+    async adminAuth(req: Request, loginAdminDto: loginAdminDTO) {
+        const admin = await this.prisma.admin.findFirst({
+            where: {
+                AND: [
+                    {
+                        username: this.crypto.cipherEncryption(
+                            loginAdminDto.username
+                        )
+                    },
+                    {
+                        password: this.crypto.cipherEncryption(
+                            loginAdminDto.password
+                        )
+                    }
+                ]
+            }
+        });
+        if (!admin) throw new UnauthorizedException();
+        const { password, ...rest } = admin;
+        req.session.user = { ...rest, ROLE: 'ADMIN' };
+        return { ...rest, ROLE: 'ADMIN' };
     }
 }
