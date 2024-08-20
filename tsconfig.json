@@ -17,6 +17,9 @@
         "strictBindCallApply": false,
         "forceConsistentCasingInFileNames": false,
         "noFallthroughCasesInSwitch": false,
-        "typeRoots": ["./src/types", "./node_modules/@types"]
+        "typeRoots": ["./src/types", "./node_modules/@types"],
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "checkJs": true
     }
 }

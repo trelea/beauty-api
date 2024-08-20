@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class getMastersCountRes {
+    @ApiProperty()
+    masters: number;
+}
+
 export class createMasterRes {
     @ApiProperty()
     id: string;
@@ -11,6 +16,8 @@ export class createMasterRes {
     email: string;
     @ApiProperty()
     contact: string;
+    @ApiProperty()
+    birthDate: string;
     @ApiProperty()
     description: string;
     @ApiProperty()

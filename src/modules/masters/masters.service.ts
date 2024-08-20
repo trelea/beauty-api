@@ -29,6 +29,8 @@ export class MastersService {
 
     // GET MASTERS
     async getMasters(pagination?: number, search?: string) {
+        if (String(pagination) === '-1')
+            return await this.prisma.master.findMany();
         return await this.prisma.master.findMany({
             where: {
                 OR: [

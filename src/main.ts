@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { json, urlencoded } from 'express';
-import * as session from 'express-session';
+import session from 'express-session';
 import { sessionConf } from './config/session.config';
 import { corsConf } from './config/cors.config';
 import { SwaggerSetup } from './config/swagger.config';
