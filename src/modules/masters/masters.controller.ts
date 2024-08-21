@@ -30,21 +30,35 @@ import {
 } from '@nestjs/swagger';
 import { masterBody } from './docs/master.body';
 import { fileFiltration } from 'src/utils/thumb.util';
-import { createMasterRes } from './docs/masters.res';
+import {
+    createMasterRes,
+    getMastersCountRes,
+    getMastersDtailsRes
+} from './docs/masters.res';
 import { createMasterDTO } from './dtos/create.master.dto';
 import { updateMasterDTO } from './dtos/update.master.dto';
+// import { GetMastersInterceptor } from 'src/interceptors/get.masters.interceptor';
 
 @ApiTags('Masters APIs')
 @Controller('masters')
-@UseGuards(AdminGuard, AuthGuard_)
 export class MastersController {
     constructor(private readonly mastersService: MastersService) {}
+
+    // GET MASTERS CARDS DETAILS
+    @Get('details')
+    @ApiOperation({ summary: 'Get master details for normal users' })
+    @ApiResponse({ type: getMastersDtailsRes, isArray: true })
+    async getMastersDetails() {
+        return this.mastersService.getMastersDetails();
+    }
 
     // MASTERS COUNT
     @Get('count')
     @Roles(['ADMIN'])
+    @UseGuards(AdminGuard, AuthGuard_)
     // DOCS
     @ApiOperation({ summary: 'Get masters count' })
+    @ApiResponse({ type: getMastersCountRes })
     async getMastersCount() {
         return this.mastersService.getMastersCount();
     }
@@ -52,10 +66,13 @@ export class MastersController {
     // GET MASTERS
     @Get()
     @Roles(['ADMIN'])
+    @UseGuards(AdminGuard, AuthGuard_)
+    // @UseInterceptors(GetMastersInterceptor)
     // DOCS
     @ApiOperation({ summary: 'Get all masters' })
     @ApiQuery({ name: 'page', required: false })
     @ApiQuery({ name: 'search', required: false })
+    @ApiResponse({ type: createMasterRes, isArray: true })
     async getMasters(
         @Query('page') pagination: number = 1,
         @Query('search') search: string = ''
@@ -66,6 +83,8 @@ export class MastersController {
     // GET MASTER
     @Get(':id')
     @Roles(['ADMIN'])
+    // @UseInterceptors(GetMastersInterceptor)
+    @UseGuards(AdminGuard, AuthGuard_)
     // DOCS
     @ApiOperation({ summary: 'Get one master' })
     @ApiParam({
@@ -74,6 +93,7 @@ export class MastersController {
         description: 'master id',
         required: true
     })
+    @ApiResponse({ type: createMasterRes })
     async getMaster(@Param('id') id: string) {
         return this.mastersService.getMaster(id);
     }
@@ -81,6 +101,7 @@ export class MastersController {
     // CREATE MASTER
     @Post()
     @Roles(['ADMIN'])
+    @UseGuards(AdminGuard, AuthGuard_)
     @UseInterceptors(
         FileInterceptor('thumbnail', {
             fileFilter: fileFiltration,
@@ -116,6 +137,7 @@ export class MastersController {
     // UPDATE MASTER
     @Patch(':id')
     @Roles(['ADMIN'])
+    @UseGuards(AdminGuard, AuthGuard_)
     @UseInterceptors(
         FileInterceptor('thumbnail', {
             fileFilter: fileFiltration,
@@ -159,6 +181,7 @@ export class MastersController {
     // DELETE MASTER
     @Delete(':id')
     @Roles(['ADMIN'])
+    @UseGuards(AdminGuard, AuthGuard_)
     // DOCS
     @ApiOperation({ summary: 'Delete master' })
     @ApiParam({
@@ -167,6 +190,7 @@ export class MastersController {
         description: 'master id',
         required: true
     })
+    @ApiResponse({ type: createMasterRes })
     async deleteMaster(@Param('id') id: string) {
         return this.mastersService.deleteMaster(id);
     }

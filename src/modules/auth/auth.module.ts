@@ -34,7 +34,7 @@ import { GoogleStrategy } from 'src/strategies/google.strategy';
                 }
             },
             defaults: {
-                from: '"No Reply" <beauty-salon@mail.com>',
+                from: '"Beauty Salon" <beauty-salon@mail.com>',
                 subject: 'One-Time Password Verification.'
             }
         }),

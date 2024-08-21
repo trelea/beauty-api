@@ -27,13 +27,102 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
-## Installation
+## Installation and Running
 
-```bash
-$ yarn install
-```
+-   ### Install packages and dev dependencies
+
+    ```bash
+    $ yarn install
+    ```
+
+-   ### Set up environment variables
+
+    ```
+    DATABASE_URL="postgresql://<pg_user>:<pg_pswd>@localhost:<pg_port>/<pg_db>?schema=public"
+
+    POSTGRES_USER=<pg_user>
+    POSTGRES_PASSWORD=<pg_pswd>
+    POSTGRES_DB=<pg_db>
+    POSTGRES_PORT=<pg_port>
+
+    SESSION_SECRET=<secret>
+    SESSION_EXPIRE=<number>
+    JWT_SECRET=<secret>
+
+    ENC_KEY=<random_string_key>
+    ENC_ALG=<encryption_algorithm>
+    ENC_IV=<random_string_key>
+
+    BREVO_HOST=smtp-relay.brevo.com
+    BREVO_PORT=587
+    BREVO_USER=<brevo_user>
+    BREVO_PASS=<brevo_password>
+
+    GOOGLE_CLIENT_ID=<id>
+    GOOGLE_CLIENT_SECRET=<secret>
+    GOOGLE_CLIENT_CALLBACK=<link>
+
+    SUCCESS_LINK=<nestjs_api_url>/google/success
+    FAIL_LINK=<nestjs_api_url>/google/fail
+    ```
+
+-   ### Start Postgres Docker Container
+
+    ```bash
+    $ docker-compose up
+    ```
+
+-   ### Generate Prisma Client
+
+    ```bash
+    $ yarn prisma generate
+    ```
+
+-   ### Run database migrations
+
+    ```bash
+    $ yarn prisma migrate dev --name migration
+    ```
+
+-   ### Create a local directory to store all thumbnails
+
+    ```bash
+    $ mkdir uploads
+    ```
+
+-   ### Setup admin and working hours for app
+
+    ```bash
+    $ npx ts-node ./src/scripts/startup.app.ts
+    ```
+
+-   ### Start the NestJS application
+
+    ```bash
+    $ yarn run start:dev
+    ```
 
 ## Running the app
+
+Start Postgres Docker Container.
+
+```bash
+$ docker-compose up
+```
+
+Start APIs
+
+```bash
+$ yarn run start:dev
+```
+
+Optional prisma studio.
+
+```bash
+$ yarn prisma studio
+```
+
+Basic commands to run nestjs app.
 
 ```bash
 # development
