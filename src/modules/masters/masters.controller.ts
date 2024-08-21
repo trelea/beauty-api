@@ -30,15 +30,27 @@ import {
 } from '@nestjs/swagger';
 import { masterBody } from './docs/master.body';
 import { fileFiltration } from 'src/utils/thumb.util';
-import { createMasterRes, getMastersCountRes } from './docs/masters.res';
+import {
+    createMasterRes,
+    getMastersCountRes,
+    getMastersDtailsRes
+} from './docs/masters.res';
 import { createMasterDTO } from './dtos/create.master.dto';
 import { updateMasterDTO } from './dtos/update.master.dto';
-import { GetMastersInterceptor } from 'src/interceptors/get.masters.interceptor';
+// import { GetMastersInterceptor } from 'src/interceptors/get.masters.interceptor';
 
 @ApiTags('Masters APIs')
 @Controller('masters')
 export class MastersController {
     constructor(private readonly mastersService: MastersService) {}
+
+    // GET MASTERS CARDS DETAILS
+    @Get('details')
+    @ApiOperation({ summary: 'Get master details for normal users' })
+    @ApiResponse({ type: getMastersDtailsRes, isArray: true })
+    async getMastersDetails() {
+        return this.mastersService.getMastersDetails();
+    }
 
     // MASTERS COUNT
     @Get('count')
@@ -53,7 +65,9 @@ export class MastersController {
 
     // GET MASTERS
     @Get()
-    @UseInterceptors(GetMastersInterceptor)
+    @Roles(['ADMIN'])
+    @UseGuards(AdminGuard, AuthGuard_)
+    // @UseInterceptors(GetMastersInterceptor)
     // DOCS
     @ApiOperation({ summary: 'Get all masters' })
     @ApiQuery({ name: 'page', required: false })
@@ -69,7 +83,7 @@ export class MastersController {
     // GET MASTER
     @Get(':id')
     @Roles(['ADMIN'])
-    @UseInterceptors(GetMastersInterceptor)
+    // @UseInterceptors(GetMastersInterceptor)
     @UseGuards(AdminGuard, AuthGuard_)
     // DOCS
     @ApiOperation({ summary: 'Get one master' })

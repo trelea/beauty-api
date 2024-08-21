@@ -29,3 +29,16 @@ export class createMasterRes {
     @ApiProperty()
     updated_at: string;
 }
+
+export class getMastersDtailsRes {
+    @ApiProperty()
+    firstName: string;
+    @ApiProperty()
+    lastName: string;
+    @ApiProperty()
+    thumbnail: string;
+    @ApiProperty()
+    services: string[];
+    @ApiProperty()
+    description: string;
+}

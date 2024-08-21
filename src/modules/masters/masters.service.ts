@@ -29,8 +29,6 @@ export class MastersService {
 
     // GET MASTERS
     async getMasters(pagination?: number, search?: string) {
-        // if (String(pagination) === '-1')
-        //     return await this.prisma.master.findMany();
         return await this.prisma.master.findMany({
             where: {
                 OR: [
@@ -149,20 +147,25 @@ export class MastersService {
                     .png()
                     .toFile(join(thumbsPath, newFileName));
             } catch (err) {
-                throw new InternalServerErrorException(
-                    'Server occurred an error while updating file'
+                throw new HttpException(
+                    err.meta,
+                    HttpStatus.INTERNAL_SERVER_ERROR
                 );
             }
         }
 
-        return await this.prisma.master.update({
-            where: { id },
-            data: {
-                ...updateMasterDto,
-                thumbnail: thumbnail ? newFileName : thumb,
-                services
-            }
-        });
+        try {
+            return await this.prisma.master.update({
+                where: { id },
+                data: {
+                    ...updateMasterDto,
+                    thumbnail: thumbnail ? newFileName : thumb,
+                    services
+                }
+            });
+        } catch (err) {
+            throw new HttpException(err.meta, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // DELETE MASTER
@@ -172,5 +175,18 @@ export class MastersService {
         } catch (err) {
             throw new HttpException(err.meta, HttpStatus.NOT_FOUND);
         }
+    }
+
+    // GET MASTERS CARDS DETAILS
+    async getMastersDetails() {
+        return await this.prisma.master.findMany({
+            select: {
+                firstName: true,
+                lastName: true,
+                thumbnail: true,
+                services: true,
+                description: true
+            }
+        });
     }
 }
