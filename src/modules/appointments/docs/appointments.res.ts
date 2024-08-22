@@ -136,4 +136,6 @@ export class getAppointmentByStatusRes {
     googleUser: any;
     @ApiProperty()
     user: _U;
+    @ApiProperty()
+    unauthUser: _U;
 }

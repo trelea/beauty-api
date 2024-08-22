@@ -37,7 +37,7 @@ import { AppointmentsLashesService } from './appointments-lashes.service';
 import { Request } from 'express';
 
 @ApiTags('Appointments Lashes APIs')
-@UseGuards(AuthGuard_)
+// @UseGuards(AuthGuard_)
 @Controller('appointments/lashes')
 export class AppointmentsLashesController {
     constructor(
@@ -47,6 +47,7 @@ export class AppointmentsLashesController {
     // GET APPOINTMENTS FOR ADMIN AND USER
     @Get()
     @UseInterceptors(GetAppointmentsInterceptor)
+    @UseGuards(AuthGuard_)
     // DOCS
     @ApiOperation({ summary: 'Get appointments lashes' })
     @ApiResponse({ type: getAppointmentsRes, isArray: true })
@@ -57,6 +58,7 @@ export class AppointmentsLashesController {
     // CREATE APPOINTMENT
     @Post()
     @UsePipes(ValidationPipe)
+    // @UseGuards(AuthGuard_)
     // DOCS
     @ApiOperation({ summary: 'Create appointment lashes' })
     @ApiBody(appointmentBody)
@@ -74,7 +76,7 @@ export class AppointmentsLashesController {
     // APPROVE APPOINTMENT
     @Patch('approve/:id')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     // DOCS
     @ApiOperation({ summary: 'Approve appointment lashes' })
     @ApiParam({
@@ -91,7 +93,7 @@ export class AppointmentsLashesController {
     // DENY APPOINTMENT
     @Patch('deny/:id')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     // DOCS
     @ApiOperation({ summary: 'Deny appointment lashes' })
     @ApiParam({
@@ -118,7 +120,7 @@ export class AppointmentsLashesController {
     // GET PENDING
     @Get('pending')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     @ApiOperation({ summary: 'Get pending appointments brows' })
     @ApiResponse({ type: getAppointmentByStatusRes, isArray: true })
     async getPending() {
@@ -128,7 +130,7 @@ export class AppointmentsLashesController {
     // GET APPROVED
     @Get('approved')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     @ApiOperation({ summary: 'Get approved appointments brows' })
     @ApiResponse({ type: getAppointmentByStatusRes, isArray: true })
     async getApproved() {
@@ -138,7 +140,7 @@ export class AppointmentsLashesController {
     // GET DENIED
     @Get('denied')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     @ApiOperation({ summary: 'Get denied appointments brows' })
     @ApiResponse({ type: getAppointmentByStatusRes, isArray: true })
     async getDenied() {

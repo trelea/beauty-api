@@ -1,9 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    InternalServerErrorException
+} from '@nestjs/common';
 import { Request } from 'express';
 import { PrismaService } from 'prisma/prisma.service';
 import { createAppointmentDTO } from '../dtos/create.appointment.dto';
 import { getDfaultHoursNails } from '../../../utils/hours.util';
 import { MailService } from 'src/utils/mail.util';
+import { isNullOrUndefined } from 'src/utils/helpers.util';
 
 @Injectable()
 export class AppointmentsNailsService {
@@ -83,29 +88,58 @@ export class AppointmentsNailsService {
                 message: 'Invalid time appointment'
             });
 
-        return {
-            service: 'nails',
-            ...(await this.prisma.appointmentsNails.create({
-                data: {
-                    userId: !req.session.user.provider
-                        ? req.session.user.id
-                        : undefined,
-                    googleUserId:
-                        req.session.user.provider === 'google'
-                            ? req.session.user.id
-                            : undefined,
-                    ...createAppointmentDto
-                },
-                select: {
-                    status: true,
-                    time: true,
-                    date: true,
-                    phone: true,
-                    description: true,
-                    master: { select: { firstName: true, lastName: true } }
-                }
-            }))
-        };
+        let { firstName, lastName, birthDate, email, ...rest } =
+            createAppointmentDto;
+
+        let unauthUser: any | undefined = undefined;
+        if (
+            !req.session?.user?.id &&
+            !isNullOrUndefined(firstName) &&
+            !isNullOrUndefined(lastName) &&
+            !isNullOrUndefined(email) &&
+            !isNullOrUndefined(birthDate)
+        ) {
+            if (birthDate) birthDate = new Date(birthDate);
+            unauthUser = await this.prisma.unauthUserSource.create({
+                data: { firstName, lastName, email, birthDate }
+            });
+        }
+
+        try {
+            return {
+                service: 'brows',
+                ...(await this.prisma.appointmentsNails.create({
+                    data: {
+                        userId: !req?.session?.user?.provider
+                            ? req.session.user?.id
+                            : null,
+                        googleUserId:
+                            req?.session?.user?.provider === 'google'
+                                ? req.session.user?.id
+                                : null,
+                        unauthUserId: !isNullOrUndefined(unauthUser)
+                            ? unauthUser.id
+                            : null,
+                        ...rest
+                    },
+                    select: {
+                        status: true,
+                        time: true,
+                        date: true,
+                        phone: true,
+                        description: true,
+                        master: {
+                            select: { firstName: true, lastName: true }
+                        }
+                    }
+                }))
+            };
+        } catch (err) {
+            throw new InternalServerErrorException(
+                err,
+                'InternalServerErrorException'
+            );
+        }
     }
 
     // APPROVE APPOINTMENT
@@ -117,6 +151,7 @@ export class AppointmentsNailsService {
                 id: true,
                 user: true,
                 googleUser: true,
+                unauthUser: true,
                 status: true,
                 date: true,
                 time: true,
@@ -147,7 +182,25 @@ export class AppointmentsNailsService {
             client: null as string
         };
 
-        if (appointment.user !== null && appointment.googleUser === null) {
+        if (
+            appointment.unauthUser !== null &&
+            appointment.googleUser === null &&
+            appointment.user === null
+        ) {
+            data = {
+                ...data,
+                client: `${appointment.unauthUser.firstName} ${appointment.unauthUser.lastName}`,
+                to: appointment.unauthUser.email
+            };
+            this.mailService.sendApproveMailNotification(data);
+            return { _id: appointment.id, status: appointment.status };
+        }
+
+        if (
+            appointment.user !== null &&
+            appointment.googleUser === null &&
+            appointment.unauthUser === null
+        ) {
             data = {
                 ...data,
                 client: `${appointment.user.firstName} ${appointment.user.lastName}`,
@@ -157,7 +210,11 @@ export class AppointmentsNailsService {
             return { _id: appointment.id, status: appointment.status };
         }
 
-        if (appointment.googleUser !== null && appointment.user === null) {
+        if (
+            appointment.googleUser !== null &&
+            appointment.user === null &&
+            appointment.unauthUser === null
+        ) {
             const google = JSON.parse(JSON.stringify(appointment.googleUser));
             data = {
                 ...data,
@@ -247,6 +304,9 @@ export class AppointmentsNailsService {
                     }
                 },
                 googleUser: true,
+                unauthUser: {
+                    select: { id: true, firstName: true, lastName: true }
+                },
                 user: {
                     select: { id: true, firstName: true, lastName: true }
                 }
@@ -276,6 +336,9 @@ export class AppointmentsNailsService {
                     }
                 },
                 googleUser: true,
+                unauthUser: {
+                    select: { id: true, firstName: true, lastName: true }
+                },
                 user: {
                     select: { id: true, firstName: true, lastName: true }
                 }
@@ -305,6 +368,9 @@ export class AppointmentsNailsService {
                     }
                 },
                 googleUser: true,
+                unauthUser: {
+                    select: { id: true, firstName: true, lastName: true }
+                },
                 user: {
                     select: { id: true, firstName: true, lastName: true }
                 }
