@@ -180,7 +180,7 @@ export class AppointmentsLashesService {
                 new Date(appointment.time).getHours().toString().length === 1
                     ? `0${new Date(appointment.time).getHours().toString()}:00`
                     : `${new Date(appointment.time).getHours().toString()}:00`,
-            service: 'brows',
+            service: 'lashes',
             master: `${appointment.master.firstName} ${appointment.master.lastName}`,
             to: null as string,
             client: null as string
