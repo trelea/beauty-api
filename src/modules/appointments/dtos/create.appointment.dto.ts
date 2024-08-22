@@ -1,11 +1,12 @@
 import {
     IsDateString,
+    IsEmail,
     IsMobilePhone,
     IsNotEmpty,
     IsOptional,
     IsString,
-    IsTimeZone,
-    IsUUID
+    IsUUID,
+    Length
 } from 'class-validator';
 
 export class createAppointmentDTO {
@@ -27,5 +28,21 @@ export class createAppointmentDTO {
 
     @IsString()
     @IsOptional()
-    readonly description: string;
+    readonly description?: string;
+
+    // UNAUTH USER
+    @IsString()
+    @Length(2, 50)
+    @IsOptional()
+    readonly firstName?: string;
+    @IsString()
+    @Length(2, 50)
+    @IsOptional()
+    readonly lastName?: string;
+    @IsEmail()
+    @IsOptional()
+    readonly email?: string;
+    @IsDateString()
+    @IsOptional()
+    birthDate?: Date;
 }

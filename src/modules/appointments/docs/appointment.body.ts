@@ -26,6 +26,31 @@ export const appointmentBody = {
                 type: 'string',
                 example: 'i want big nails',
                 description: 'optional description for master'
+            },
+            // REQURED FALSE
+            firstName: {
+                type: 'string',
+                example: 'Optional? Rumble',
+                description: "Optional? User's first name",
+                required: ['false']
+            },
+            lastName: {
+                type: 'string',
+                example: 'Optional? Ann',
+                description: "Optional? User's last name",
+                required: ['false']
+            },
+            email: {
+                type: 'string',
+                example: 'Optional? ann.rumble@gmail.com',
+                description: "Optional? User's mail",
+                required: ['false']
+            },
+            birthDate: {
+                type: 'string',
+                example: 'Optional? 2000-08-26',
+                description: "Optional? User's birth date",
+                required: ['false']
             }
         }
     }

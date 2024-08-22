@@ -37,16 +37,17 @@ import { Roles } from 'src/guards/roles';
 import { AdminGuard } from 'src/guards/admin.guard';
 
 @ApiTags('Appointments Nails APIs')
-@UseGuards(AuthGuard_)
+// @UseGuards(AuthGuard_)
 @Controller('appointments/nails')
 export class AppointmentsNailsController {
     constructor(
         private readonly appointmentsNailsService: AppointmentsNailsService
     ) {}
 
-    // GET APPOINTMENTS FOR ADMIN AND USER
+    // GET APPOINTMENTS FOR USER
     @Get()
     @UseInterceptors(GetAppointmentsInterceptor)
+    @UseGuards(AuthGuard_)
     // DOCS
     @ApiOperation({ summary: 'Get appointments nails' })
     @ApiResponse({ type: getAppointmentsRes, isArray: true })
@@ -57,6 +58,7 @@ export class AppointmentsNailsController {
     // CREATE APPOINTMENT
     @Post()
     @UsePipes(ValidationPipe)
+    // @UseGuards(AuthGuard_)
     // DOCS
     @ApiOperation({ summary: 'Create appointment nails' })
     @ApiBody(appointmentBody)
@@ -74,7 +76,7 @@ export class AppointmentsNailsController {
     // APPROVE APPOINTMENT
     @Patch('approve/:id')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     // DOCS
     @ApiOperation({ summary: 'Approve appointment nails' })
     @ApiParam({
@@ -91,7 +93,7 @@ export class AppointmentsNailsController {
     // DENY APPOINTMENT
     @Patch('deny/:id')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     // DOCS
     @ApiOperation({ summary: 'Deny appointment nails' })
     @ApiParam({
@@ -118,7 +120,7 @@ export class AppointmentsNailsController {
     // GET PENDING
     @Get('pending')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     @ApiOperation({ summary: 'Get pending appointments brows' })
     @ApiResponse({ type: getAppointmentByStatusRes, isArray: true })
     async getPending() {
@@ -128,7 +130,7 @@ export class AppointmentsNailsController {
     // GET APPROVED
     @Get('approved')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     @ApiOperation({ summary: 'Get approved appointments brows' })
     @ApiResponse({ type: getAppointmentByStatusRes, isArray: true })
     async getApproved() {
@@ -138,7 +140,7 @@ export class AppointmentsNailsController {
     // GET DENIED
     @Get('denied')
     @Roles(['ADMIN'])
-    @UseGuards(AdminGuard)
+    @UseGuards(AuthGuard_, AdminGuard)
     @ApiOperation({ summary: 'Get denied appointments brows' })
     @ApiResponse({ type: getAppointmentByStatusRes, isArray: true })
     async getDenied() {

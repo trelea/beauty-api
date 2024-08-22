@@ -77,58 +77,71 @@ enum Status {
 }
 
 model AppointmentsBrows {
-  id           String      @id @default(uuid())
-  user         User?       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id           String            @id @default(uuid())
+  user         User?             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId       String?
-  googleUser   GoogleUser? @relation(fields: [googleUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  googleUser   GoogleUser?       @relation(fields: [googleUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   googleUserId String?
-  master       Master      @relation(fields: [masterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unauthUser   unauthUserSource? @relation(fields: [unauthUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unauthUserId String?           @unique
+  master       Master            @relation(fields: [masterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   masterId     String
-
-  time        DateTime @db.Time()
-  date        DateTime @db.Date
-  phone       String
-  description String?
-  status      Status   @default(PENDING)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  time         DateTime          @db.Time()
+  date         DateTime          @db.Date
+  phone        String
+  description  String?
+  status       Status            @default(PENDING)
+  created_at   DateTime          @default(now())
+  updated_at   DateTime          @updatedAt
 }
 
 model AppointmentsLashes {
-  id           String      @id @default(uuid())
-  user         User?       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id           String            @id @default(uuid())
+  user         User?             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId       String?
-  googleUser   GoogleUser? @relation(fields: [googleUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  googleUser   GoogleUser?       @relation(fields: [googleUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   googleUserId String?
-  master       Master      @relation(fields: [masterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unauthUser   unauthUserSource? @relation(fields: [unauthUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unauthUserId String?           @unique
+  master       Master            @relation(fields: [masterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   masterId     String
-
-  time        DateTime @db.Time()
-  date        DateTime @db.Date
-  phone       String
-  description String?
-  status      Status   @default(PENDING)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  time         DateTime          @db.Time()
+  date         DateTime          @db.Date
+  phone        String
+  description  String?
+  status       Status            @default(PENDING)
+  created_at   DateTime          @default(now())
+  updated_at   DateTime          @updatedAt
 }
 
 model AppointmentsNails {
-  id           String      @id @default(uuid())
-  user         User?       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id           String            @id @default(uuid())
+  user         User?             @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId       String?
-  googleUser   GoogleUser? @relation(fields: [googleUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  googleUser   GoogleUser?       @relation(fields: [googleUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   googleUserId String?
-  master       Master      @relation(fields: [masterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unauthUser   unauthUserSource? @relation(fields: [unauthUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  unauthUserId String?           @unique
+  master       Master            @relation(fields: [masterId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   masterId     String
+  time         DateTime          @db.Time()
+  date         DateTime          @db.Date
+  phone        String
+  description  String?
+  status       Status            @default(PENDING)
+  created_at   DateTime          @default(now())
+  updated_at   DateTime          @updatedAt
+}
 
-  time        DateTime @db.Time()
-  date        DateTime @db.Date
-  phone       String
-  description String?
-  status      Status   @default(PENDING)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model unauthUserSource {
+  id                 String              @id @default(uuid())
+  firstName          String
+  lastName           String
+  email              String
+  birthDate          DateTime            @db.Date
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @updatedAt
+  AppointmentsBrows  AppointmentsBrows?
+  AppointmentsLashes AppointmentsLashes?
+  AppointmentsNails  AppointmentsNails?
 }
