@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SettingsModule } from './modules/settings/settings.module';
 import { MastersModule } from './modules/masters/masters.module';
 import { AppointmentsModule } from './modules/appointments/appointments.module';
+import { HoursModule } from './modules/hours/hours.module';
 
 @Module({
     imports: [
@@ -11,7 +12,8 @@ import { AppointmentsModule } from './modules/appointments/appointments.module';
         AuthModule,
         SettingsModule,
         MastersModule,
-        AppointmentsModule
+        AppointmentsModule,
+        HoursModule
     ],
     controllers: [],
     providers: []
