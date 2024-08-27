@@ -87,4 +87,54 @@ export class MailService {
 			`
         });
     }
+
+    notifyAdmin({
+        to,
+        service,
+        date,
+        time,
+        master,
+        contact,
+        client
+    }: {
+        to: string;
+        service: 'lashes' | 'brows' | 'nails';
+        date: string;
+        time: string;
+        master: string;
+        contact: string;
+        client: string;
+    }) {
+        return this.mailService.sendMail({
+            to,
+            text: 'New Appointment Created',
+            subject: 'New Appointment Created.',
+            html: `
+			<!doctype html>
+			<html>
+				<head>
+					<meta charset="UTF-8" />
+    				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+				</head>
+				<body>
+					<main>
+						<div>
+							<h1>New Appointment</h1>
+							<br>
+							<p>New <strong>${service}</strong> appointment was created. Please check admin dashboard and approve it.</p>
+							<br>
+							<p><strong>Appointment Details:</strong></p>
+							<ul>
+								<li>Master: <strong>${master}</strong></li>
+								<li>Date Time: <strong>${date}</strong> at <strong>${time}</strong></li>
+								<li>Client Contact: ${client} <strong>${contact}</strong></li>
+							</ul>
+							
+						</div>
+					</main>
+				</body>
+			</html>
+			`
+        });
+    }
 }

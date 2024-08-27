@@ -106,33 +106,88 @@ export class AppointmentsNailsService {
         }
 
         try {
-            return {
-                service: 'brows',
-                ...(await this.prisma.appointmentsNails.create({
-                    data: {
-                        userId: !req?.session?.user?.provider
+            const appointment = await this.prisma.appointmentsNails.create({
+                data: {
+                    userId: !req?.session?.user?.provider
+                        ? req.session.user?.id
+                        : null,
+                    googleUserId:
+                        req?.session?.user?.provider === 'google'
                             ? req.session.user?.id
                             : null,
-                        googleUserId:
-                            req?.session?.user?.provider === 'google'
-                                ? req.session.user?.id
-                                : null,
-                        unauthUserId: !isNullOrUndefined(unauthUser)
-                            ? unauthUser.id
-                            : null,
-                        ...rest
+                    unauthUserId: !isNullOrUndefined(unauthUser)
+                        ? unauthUser.id
+                        : null,
+                    ...rest
+                },
+                select: {
+                    status: true,
+                    time: true,
+                    date: true,
+                    phone: true,
+                    description: true,
+                    master: {
+                        select: { firstName: true, lastName: true }
                     },
-                    select: {
-                        status: true,
-                        time: true,
-                        date: true,
-                        phone: true,
-                        description: true,
-                        master: {
-                            select: { firstName: true, lastName: true }
-                        }
-                    }
-                }))
+                    unauthUser: { select: { firstName: true, lastName: true } },
+                    user: { select: { firstName: true, lastName: true } },
+                    googleUser: true
+                }
+            });
+
+            let client: string | undefined;
+
+            if (
+                appointment.unauthUser !== null &&
+                appointment.googleUser === null &&
+                appointment.user === null
+            )
+                client = `${appointment.unauthUser.firstName} ${appointment.unauthUser.lastName}`;
+
+            if (
+                appointment.user !== null &&
+                appointment.googleUser === null &&
+                appointment.unauthUser === null
+            )
+                client = `${appointment.user.firstName} ${appointment.user.lastName}`;
+
+            if (
+                appointment.googleUser !== null &&
+                appointment.user === null &&
+                appointment.unauthUser === null
+            ) {
+                const google = JSON.parse(
+                    JSON.stringify(appointment.googleUser)
+                );
+                client = google.profile.displayName as string;
+            }
+
+            this.mailService.notifyAdmin({
+                to: (
+                    await this.prisma.admin.findMany({
+                        orderBy: { created_at: 'desc' },
+                        take: 1
+                    })
+                )[0].email as string,
+                service: 'nails',
+                date: new Date(appointment.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                }),
+                time:
+                    new Date(appointment.time).getHours().toString().length ===
+                    1
+                        ? `0${new Date(appointment.time).getHours().toString()}:00`
+                        : `${new Date(appointment.time).getHours().toString()}:00`,
+                contact: appointment.phone,
+                master: `${appointment.master.firstName} ${appointment.master.lastName}`,
+                client
+            });
+
+            return {
+                service: 'nails',
+                ...appointment
             };
         } catch (err) {
             throw new InternalServerErrorException(
