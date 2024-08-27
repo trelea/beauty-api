@@ -43,6 +43,7 @@ model Admin {
   id         String   @id @default(uuid())
   username   String
   password   String
+  email      String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }

@@ -27,12 +27,13 @@ const cipherEncryption = (plainText: string): string => {
 
 const main = async () => {
     let username: string = input('Admin Username: ') as string;
+    let email: string = input('Admin Email: ') as string;
     let password: string = input('Admin Password: ') as string;
     username = cipherEncryption(username);
     password = cipherEncryption(password);
 
     const admin = await prisma.admin.create({
-        data: { username, password }
+        data: { username, password, email }
     });
     console.log(admin);
 };

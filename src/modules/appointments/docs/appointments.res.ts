@@ -70,6 +70,12 @@ export class createAppointmentRes {
     description: string;
     @ApiProperty()
     master: Pick<MasterRes, 'firstName' | 'lastName'>;
+    @ApiProperty()
+    googleUser: any | null;
+    @ApiProperty()
+    unauthUser: Pick<MasterRes, 'firstName' | 'lastName'> | null;
+    @ApiProperty()
+    user: Pick<MasterRes, 'firstName' | 'lastName'> | null;
 }
 
 export class getAvailableRes {
