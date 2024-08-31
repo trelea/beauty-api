@@ -83,7 +83,7 @@ export class AppointmentsBrowsService {
             },
             select: { id: true }
         });
-        console.log(registred);
+
         if (registred)
             throw new BadRequestException({
                 message: 'Invalid time appointment'

@@ -52,6 +52,16 @@ export class MastersController {
         return this.mastersService.getMastersDetails();
     }
 
+    // GET MASTERS CARDS DETAILS BY SERVICE
+    @Get('details/:service')
+    @ApiOperation({ summary: 'Get master details for normal users by service' })
+    @ApiResponse({ type: getMastersDtailsRes, isArray: true })
+    async getMastersDetailsByService(
+        @Param('service') service: 'Lashes' | 'Brows' | 'Nails'
+    ) {
+        return this.mastersService.getMastersDetailsByService(service);
+    }
+
     // MASTERS COUNT
     @Get('count')
     @Roles(['ADMIN'])

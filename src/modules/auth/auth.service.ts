@@ -42,14 +42,12 @@ export class AuthService {
             payload: registerDto
         };
 
-        console.log(
-            await this.mail.sendOTPCodeTo({
-                otp,
-                to: registerDto.email,
-                firstName: registerDto.firstName,
-                lastName: registerDto.lastName
-            })
-        );
+        await this.mail.sendOTPCodeTo({
+            otp,
+            to: registerDto.email,
+            firstName: registerDto.firstName,
+            lastName: registerDto.lastName
+        });
 
         return { token };
     }
