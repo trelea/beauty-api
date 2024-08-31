@@ -189,4 +189,24 @@ export class MastersService {
             }
         });
     }
+
+    // GET MASTERS CARDS DETAILS
+    async getMastersDetailsByService(service: 'Lashes' | 'Brows' | 'Nails') {
+        try {
+            return await this.prisma.master.findMany({
+                where: { services: { has: service } },
+                select: {
+                    firstName: true,
+                    lastName: true,
+                    thumbnail: true,
+                    services: true,
+                    description: true
+                }
+            });
+        } catch (err) {
+            throw new BadRequestException({
+                services: ['Lashes', 'Nails', 'Brows']
+            });
+        }
+    }
 }
