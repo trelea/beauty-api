@@ -1,50 +1,112 @@
+import { Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
-import { createCipheriv } from 'crypto';
+import { createCipheriv, Cipher } from 'crypto';
 import * as fs from 'node:fs';
-import _ from 'prompt-sync';
-const input = _();
+import promptSync from 'prompt-sync';
 
+const input = promptSync();
 const prisma = new PrismaClient();
 
-const setWorkHours = async () => {
-    const start: number = Number(input('Work Sarts At: '));
-    const end: number = Number(input('Work End At: '));
-    const json: { start: number; end: number } = { start, end };
-    fs.writeFile('hours.json', JSON.stringify(json), 'utf8', (err: any) => {
-        if (err) console.error(err);
-    });
+const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 };
 
-const alg: string = String(process.env.ENC_ALG);
-const key: Buffer = Buffer.alloc(32).fill(process.env.ENC_KEY);
-const iv: Buffer = Buffer.alloc(16).fill(process.env.ENC_IV);
+const getInput = (
+    message: string,
+    type: 'string' | 'number' | 'email'
+): string | number => {
+    let value: string = '';
 
+    while (
+        !value ||
+        (type === 'number' && isNaN(Number(value))) ||
+        (type === 'email' && !isValidEmail(value))
+    ) {
+        value = input(message);
+        if (!value) {
+            Logger.debug(
+                process.env.ERROR_MSG_NO_TEXT || 'Input cannot be empty.'
+            );
+        } else if (type === 'number' && isNaN(Number(value))) {
+            Logger.debug(
+                process.env.ERROR_MSG_INVALID_TYPE ||
+                    'Invalid number, please try again.'
+            );
+            value = '';
+        } else if (type === 'email' && !isValidEmail(value)) {
+            Logger.debug(
+                process.env.ERROR_MSG_INVALID_EMAIL ||
+                    'Invalid email format, please try again.'
+            );
+            value = '';
+        }
+    }
+
+    return type === 'number' ? Number(value) : value;
+};
+
+const setWorkHours = async (): Promise<void> => {
+    try {
+        const start = getInput('Work Starts At: ', 'number') as number;
+        const end = getInput('Work Ends At: ', 'number') as number;
+
+        const workHours = { start, end };
+        await fs.promises.writeFile(
+            'hours.json',
+            JSON.stringify(workHours, null, 2),
+            'utf8'
+        );
+        Logger.log('Work hours saved successfully.');
+    } catch (err) {
+        Logger.error('Failed to save work hours:', err);
+    }
+};
+
+// Encryption helper
 const cipherEncryption = (plainText: string): string => {
-    const cipher = createCipheriv(alg, key, iv);
-    let enc = cipher.update(plainText, 'utf8', 'hex');
-    return (enc += cipher.final('hex'));
+    const algorithm = process.env.ENC_ALG || 'aes-256-ctr'; // Default to AES-256
+    const key = Buffer.alloc(32).fill(process.env.ENC_KEY || 'default_key');
+    const iv = Buffer.alloc(16).fill(process.env.ENC_IV || 'default_iv');
+
+    const cipher: Cipher = createCipheriv(algorithm, key, iv);
+    const encrypted = Buffer.concat([
+        cipher.update(plainText, 'utf8'),
+        cipher.final()
+    ]);
+
+    return encrypted.toString('hex');
 };
 
-const main = async () => {
-    let username: string = input('Admin Username: ') as string;
-    let email: string = input('Admin Email: ') as string;
-    let password: string = input('Admin Password: ') as string;
-    username = cipherEncryption(username);
-    password = cipherEncryption(password);
+// Main function to handle admin creation and work hours
+const createAdminAndSetHours = async (): Promise<void> => {
+    try {
+        const username = cipherEncryption(
+            getInput('Admin Username: ', 'string') as string
+        );
+        const email = getInput('Admin Email: ', 'email') as string;
+        const password = cipherEncryption(
+            getInput('Admin Password: ', 'string') as string
+        );
 
-    const admin = await prisma.admin.create({
-        data: { username, password, email }
-    });
-    console.log(admin);
+        const admin = await prisma.admin.create({
+            data: { username, password, email }
+        });
+
+        Logger.log(`Admin created: \n ${JSON.stringify(admin, null, 2)}`);
+
+        await setWorkHours();
+    } catch (error) {
+        Logger.error(
+            'Error during admin creation or setting work hours:',
+            error
+        );
+    } finally {
+        await prisma.$disconnect();
+    }
 };
 
-main()
-    .then(async () => {
-        await prisma.$disconnect();
-        setWorkHours();
-    })
-    .catch(async (e) => {
-        console.error(e);
-        await prisma.$disconnect();
-        process.exit(1);
-    });
+// Entry point
+(async () => {
+    await createAdminAndSetHours();
+})();
