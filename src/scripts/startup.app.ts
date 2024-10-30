@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { createCipheriv } from 'crypto';
 import * as fs from 'node:fs';
+import { join, resolve } from 'path';
 import _ from 'prompt-sync';
 const input = _();
 
@@ -10,7 +11,7 @@ const setWorkHours = async () => {
     const start: number = Number(input('Work Sarts At: '));
     const end: number = Number(input('Work End At: '));
     const json: { start: number; end: number } = { start, end };
-    fs.writeFile('hours.json', JSON.stringify(json), 'utf8', (err: any) => {
+    fs.writeFile(resolve(__dirname, 'hours.json'), JSON.stringify(json), 'utf8', (err: any) => {
         if (err) console.error(err);
     });
 };
