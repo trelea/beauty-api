@@ -2,14 +2,26 @@ import { Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { createCipheriv, Cipher } from 'crypto';
 import * as fs from 'node:fs';
+import path, { resolve } from 'path';
 import promptSync from 'prompt-sync';
+
 
 const input = promptSync();
 const prisma = new PrismaClient();
 
+
+const setWorkHours = async () => {
+    const start: number = Number(input('Work Sarts At: '));
+    const end: number = Number(input('Work End At: '));
+    const json: { start: number; end: number } = { start, end };
+    fs.writeFile(path.resolve(__dirname, 'hours.json'), JSON.stringify(json), 'utf8', (err: any) => {
+        if (err) console.error(err);
+    });
+
 const isValidEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+
 };
 
 const getInput = (
